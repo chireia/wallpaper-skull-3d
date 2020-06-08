@@ -140,7 +140,7 @@
 
 				// camera
 
-				camera = new XG.PerspectiveCamera( 6, SCREEN_WIDTH / SCREEN_HEIGHT, 10, 3000 );
+				camera = new XG.PerspectiveCamera( 3, SCREEN_WIDTH / SCREEN_HEIGHT, 10, 3000 );
 				camera.position.set( 0, 0, 50 );
 
 				// scene
@@ -518,7 +518,7 @@
 				angle  += 0.05 * ( targetX - angle );
 				height += 0.05 * ( targetY - height );
 
-				var d = 1300;
+				var d = 3000;
 
 				var x =  -Math.sin( angle * 0.02 ) * d;
 				var z =   Math.cos( angle * 0.02 ) * d;
