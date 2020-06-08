@@ -1,0 +1,23 @@
+{
+	"description" : "创意来自：alteredqualia.com/xg/examples/skull.html\n\n妹纸请无视！！！\n鼠标点击右上角可以变色，也就俩种！ [只适配1080P]\nClick the upper right corner to change the color !",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 0 0"
+			}
+		}
+	},
+	"preview" : "preview.jpg",
+	"tags" : [ "CGI" ],
+	"title" : "Skull_3D骷髅头 [Interactive]",
+	"type" : "web",
+	"visibility" : "public",
+	"workshopid" : 834511459
+}
