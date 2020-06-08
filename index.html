@@ -399,9 +399,12 @@
             cluts.push(clut2);
 
             effectColorCorrection = new XG.ShaderPass(XG.CLUTShader);
+            effectColorCorrection.enabled = false
             effectColorCorrection.material.uniforms.tCLUT.value = clut1;
 
             effectColor = new XG.ShaderPass(XG.ColorCorrectionShader);
+            effectColor.enabled = false
+            console.log('init -> effectColor.enabled', effectColor.enabled)
             //effectColor.material.uniforms.powRGB.value.set( 1.5, 1.25, 1 );
             //effectColor.material.uniforms.powRGB.value.set( 1.25, 1.25, 1.5 );
             effectColor.material.uniforms.powRGB.value.set(0.85, 0.85, 0.85);
