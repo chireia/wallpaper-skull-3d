@@ -9,6 +9,9 @@
     />
 
     <style>
+      :root {
+        --mainColor: 255, 0, 0;
+      }
       body {
         color: #fff;
         font-family: Monospace;
@@ -34,6 +37,7 @@
       }
 
       #stats {
+        display: none;
         position: absolute;
         top: 0;
         left: 0;
@@ -76,7 +80,7 @@
       }
 
       .digit .segment {
-        background: #f00;
+        background: rgba(var(--mainColor), 1);
         border-radius: 5px;
         position: absolute;
         opacity: 0.05;
@@ -90,7 +94,7 @@
       .digit .segment.on,
       .separator {
         opacity: 1;
-        box-shadow: 0px 0px 40px 10px rgba(255, 0, 0, 0.527),
+        box-shadow: 0px 0px 40px 10px rgba(var(--mainColor), 0.5),
           0px 0px 10px 2px rgba(255, 255, 255, 0.411);
         transition: opacity 0s;
         -webkit-transition: opacity 0s;
@@ -102,7 +106,6 @@
       .separator {
         width: 10px;
         height: 10px;
-        background: #c00;
         border-radius: 50%;
         display: inline-block;
         position: relative;
@@ -161,18 +164,6 @@
         right: 20px;
         left: 20px;
         height: 5px;
-      }
-    </style>
-    <style>
-      #BAIDU_DSPUI_FLOWBAR,
-      .adsbygoogle,
-      .ad,
-      div[class^="ad-widsget"],
-      div[id^="div-gpt-ad-"],
-      a[href*="@"][href*=".exe"],
-      a[href*="/?/"][href*=".exe"],
-      .adpushwin {
-        display: none !important;
       }
     </style>
   </head>
@@ -372,7 +363,7 @@
         var loadingElement = document.getElementById("loading");
         var loaded = 0;
 
-        var hudVisible = true;
+        var hudVisible = false;
 
         // camera controls
 
@@ -388,10 +379,9 @@
         var windowHalfX = window.innerWidth / 2;
         var windowHalfY = window.innerHeight / 2;
 
-        //
-
         var clock = new XG.Clock();
 
+        var color = 0xff0000;
         //
 
         init();
@@ -430,7 +420,7 @@
 
           //
 
-          light = new XG.SpotLight(0xff0000, 0.75, 200, Math.PI / 3);
+          light = new XG.SpotLight(color, 0.75, 200, Math.PI / 3);
           light.position.set(100, 75, 100);
           light.castShadow = true;
           light.shadowMapWidth = 128;
@@ -441,7 +431,6 @@
           scene.add(light);
 
           //
-
           light = new XG.SpotLight(0xffffff, 0.25, 200, Math.PI / 3);
           light.position.set(-100, 100, 10);
           light.castShadow = true;
@@ -597,49 +586,40 @@
           if (useDeferred) {
             //renderer.ssaoEnabled = true;
 
+            var fovRad = XG.Math.degToRad(camera.fov);
             renderer.dofEnabled = true;
             renderer.dofAutofocus = true;
             renderer.dofFancy = true;
             renderer.dofLensFstop = 1.7;
             renderer.dofLensBlurScale = 3;
-
-            var fovRad = XG.Math.degToRad(camera.fov);
             renderer.dofLensFocalLength = fov2flength(fovRad, 24);
-
             renderer.occludersEnabled = true;
 
             //
-
             effectFilm = new XG.ShaderPass(XG.SimpleFilmShader);
             effectFilm.material.uniforms.intensity.value = 0.175;
 
             clut1 = XG.ImageUtils.loadTexture(
               "textures/clut/fuji_fp-3000b_negative_.png"
             );
-            clut2 = XG.ImageUtils.loadTexture(
-              "textures/clut/fuji_superia_800_.png"
-            );
-
             clut1.minFilter = clut1.magFilter = XG.NearestFilter;
             clut1.flipY = false;
 
+            clut2 = XG.ImageUtils.loadTexture(
+              "textures/clut/fuji_superia_800_.png"
+            );
             clut2.minFilter = clut2.magFilter = XG.NearestFilter;
             clut2.flipY = false;
 
-            cluts.push(clut1);
-            cluts.push(clut2);
+            cluts.push(clut2, clut1);
 
             effectColorCorrection = new XG.ShaderPass(XG.CLUTShader);
+            effectColorCorrection.material.uniforms.tCLUT.value = clut2;
             effectColorCorrection.enabled = false;
-            effectColorCorrection.material.uniforms.tCLUT.value = clut1;
 
             effectColor = new XG.ShaderPass(XG.ColorCorrectionShader);
-            effectColor.enabled = false;
-            console.log("init -> effectColor.enabled", effectColor.enabled);
-            //effectColor.material.uniforms.powRGB.value.set( 1.5, 1.25, 1 );
-            //effectColor.material.uniforms.powRGB.value.set( 1.25, 1.25, 1.5 );
             effectColor.material.uniforms.powRGB.value.set(0.85, 0.85, 0.85);
-            //effectColor.material.uniforms.mulRGB.value.set( 1.25, 1.25, 1.25 );
+            effectColor.enabled = false;
 
             renderer.addEffect(effectColorCorrection);
             renderer.addEffect(effectColor);
@@ -648,15 +628,15 @@
 
           // stats
 
-          /*stats = new Stats();
-				container.appendChild( stats.domElement );*/
+          stats = new Stats();
+          container.appendChild(stats.domElement);
 
           // events
 
           window.addEventListener("resize", onWindowResize, false);
           document.addEventListener("keydown", onKeyDown, false);
           document.addEventListener("mousemove", onDocumentMouseMove, false);
-          renderer.domElement.addEventListener("click", cycleClut, false);
+          // renderer.domElement.addEventListener("click", cycleClut, false);
         }
 
         //
@@ -761,11 +741,14 @@
           requestAnimationFrame(animate);
           render();
 
-          // stats.update();
+          stats.update();
         }
 
         function render() {
           var delta = clock.getDelta();
+
+          // update color
+          if (color) scene.__lights[1].color = new XG.Color(color);
 
           // update camera
 
@@ -797,30 +780,33 @@
           }
 
           // render scene
-
           renderer.render(scene, camera);
         }
       }
+      window.wallpaperPropertyListener = {
+        applyUserProperties: function (properties) {
+          // Read scheme color
+          if (properties.schemecolor) {
+            // Convert the scheme color to be applied as a CSS style
+            var schemeColor = properties.schemecolor.value.split(" ");
+            var schemeColorHex = schemeColor
+              .map((v) => Math.ceil(v * 255))
+              .toString();
+            color = schemeColor.reduce(
+              (acc, v) =>
+                acc +
+                Math.ceil(v * 255)
+                  .toString(16)
+                  .padStart(2, "0"),
+              "#"
+            );
+            document.documentElement.style.setProperty(
+              "--mainColor",
+              schemeColorHex
+            );
+          }
+        },
+      };
     </script>
   </body>
-  <input
-    style="outline: none; position: absolute; right: 0px; top: 0px;"
-    name="imageField"
-    type="image"
-    id="imageField"
-    onClick="cycleClut()"
-    src="btn3.png"
-  />
-
-  <script>
-    renderer.domElement.addEventListener("click", cycleClut, false);
-    function cycleClut() {
-      clutIndex = (clutIndex + 1) % cluts.length;
-
-      var clut = cluts[clutIndex];
-      effectColorCorrection.material.uniforms.tCLUT.value = clut;
-    }
-  </script>
-  <!--<input style="outline: none; position:absolute; left:0px; top:0px; border:none;" name="imageField" type="image" id="imageField" onClick="" src="bg2.png">
-<input style="outline: none; position:absolute; left:0px; bottom:0px; border:none;" name="imageField" type="image" id="imageField" onClick="" src="bg.png">-->
 </html>

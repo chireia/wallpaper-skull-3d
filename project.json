@@ -1,10 +1,18 @@
 {
-	"description" : "",
-	"file" : "index.html",
-	"general" : {},
-	"preview" : "preview.jpg",
-	"tags" : [ "CGI" ],
-	"title" : "Skull 3D Interactive Red Ambient Light",
-	"type" : "web",
-	"visibility" : "public"
+  "description": "",
+  "file": "index.html",
+  "general": {
+    "properties": {
+      "schemecolor": {
+        "text": "Scheme color",
+        "type": "color",
+        "value": "1 0 0"
+      }
+    }
+  },
+  "preview": "preview.jpg",
+  "tags": ["CGI"],
+  "title": "Skull 3D Interactive Red Ambient Light",
+  "type": "web",
+  "visibility": "public"
 }
